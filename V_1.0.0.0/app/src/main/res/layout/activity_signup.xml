@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.SignupActivity">
+
+    <EditText
+        android:id="@+id/userName"
+        android:inputType="text"
+        android:layout_width="240dp"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:hint="@string/username"
+        android:textColorHint="#95A1AA" />
+
+    <Button
+        android:id="@+id/finish"
+        android:layout_width="155dp"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/userName"
+        android:text="@string/finish" />
+
+</RelativeLayout>
