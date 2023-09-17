@@ -3,6 +3,7 @@ package com.match.onlinechat.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -11,8 +12,7 @@ import android.widget.EditText;
 import com.match.onlinechat.R;
 import com.match.onlinechat.controller.ControllerHall;
 
-@SuppressLint("HandlerLeak")
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends Activity {
 
     public Button finish;
     public EditText userName;

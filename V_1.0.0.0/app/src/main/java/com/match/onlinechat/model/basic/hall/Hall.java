@@ -18,6 +18,7 @@ public class Hall {
 
     public Hall() { }
     public Hall(Client client){
+        user = new User();
         this.client = client;
     }
 

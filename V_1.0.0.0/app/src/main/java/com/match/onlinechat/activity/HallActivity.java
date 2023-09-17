@@ -1,32 +1,28 @@
 package com.match.onlinechat.activity;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
 import com.match.onlinechat.application.OnlineChatApplication;
+import com.match.onlinechat.model.adapter.list.ChatRoomListAdapter;
 import com.match.onlinechat.model.basic.client.Client;
 import com.match.onlinechat.controller.ControllerHall;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.match.onlinechat.R;
-import com.match.onlinechat.model.basic.constants.DefaultConfigValues;
-import com.match.onlinechat.model.basic.constants.InitErrorInfoConst;
 import com.match.onlinechat.model.basic.constants.SignupPrompt;
 import com.match.onlinechat.model.basic.constants.UserOperationError;
 import com.match.onlinechat.model.basic.user.SaveUserInfo;
 import com.match.onlinechat.model.basic.user.User;
 
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,13 +32,12 @@ public class HallActivity extends AppCompatActivity {
 
     public static Client client;
     public static ListView chatRoomList;
-    public static ArrayAdapter<String> adapter;
+    public static ChatRoomListAdapter adapter;
     public static ControllerHall controllerHall;
 
     private User user;
     private static Timer timer;
-    private static TimerTask timerTask;
-    private static boolean isInitError = false;
+    private static Thread updateChatRoomList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +47,29 @@ public class HallActivity extends AppCompatActivity {
 
         user = new User();
         client = OnlineChatApplication.client;
-        System.out.println("Hall:"+client);
 
         chatRoomList = (ListView) findViewById(R.id.chatRoomList);
-
 
         controllerHall = new ControllerHall();
         controllerHall.init();
 
-        new Thread(this::getChatRoom).start();
-
-
+        chatRoomList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String chatRoomName = adapter.getItem(i);
+                if (chatRoomName != null) {
+                    chatRoomName = chatRoomName.substring(0, chatRoomName.indexOf("("));
+                    controllerHall.selectChatRoom(chatRoomName);
+                    Intent intent = new Intent();
+                    intent.setClass(HallActivity.this, ChatActivity.class);
+                    //把聊天室名字穿给ChatActivity
+                    Bundle bundle = new Bundle();
+                    bundle.putString("chatRoomName", chatRoomName);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
@@ -159,15 +166,14 @@ public class HallActivity extends AppCompatActivity {
             public void run() {
                 controllerHall.getChatRoomList();
                 ArrayList<String> list = ControllerHall.list;
-                adapter = new ArrayAdapter<>(HallActivity.this,
+                adapter = new ChatRoomListAdapter(HallActivity.this,
                         android.R.layout.simple_list_item_1,
                         list);
             }
         };
-        HallActivity.timer = timer;
-        HallActivity.timerTask = timerTask;
         //运行
         timer.schedule(timerTask, 0 ,2000); //延迟0秒，间隔2秒循环执行
+        HallActivity.timer = timer;
     }
 
     public void isSignupMode(Menu menu){
@@ -184,17 +190,27 @@ public class HallActivity extends AppCompatActivity {
         menu.findItem(1).setVisible(false);
     }
 
-    /*private void applyForPermission(){
-        try {
-            //检测是否有写的权限
-            int permission = ActivityCompat.checkSelfPermission(this,
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                // 没有写的权限，去申请写的权限，会弹出对话框
-                ActivityCompat.requestPermissions(this, PERMISSIONS,REQUEST_EXTERNAL_STORAGE);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
+    @Override
+    protected void onPause(){
+        super.onPause();
+        //当大厅界面隐藏或不可见的时候执行一下任务
+        HallActivity.timer.cancel(); //取消定时任务
+        updateChatRoomList.interrupt(); //中断线程
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //当大厅界面可以见时再次开启线程
+        updateChatRoomList = new Thread(this::getChatRoom);
+        updateChatRoomList.start();
+    }
+
+    @Override
+    protected void onDestroy(){
+        controllerHall.sendMessage("exit_mobile"); //告诉服务端，退出app
+        System.out.println("onDestroy");
+        super.onDestroy();
+    }
+
 }

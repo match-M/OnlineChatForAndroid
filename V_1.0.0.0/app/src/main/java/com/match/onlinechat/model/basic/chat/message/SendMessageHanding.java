@@ -7,14 +7,15 @@ import com.match.onlinechat.model.basic.user.User;
 import static com.alibaba.fastjson.JSON.toJSONString;
 
 public class SendMessageHanding {
+
     private User user;
     private Client client;
     private String sendMessage;
     private String roomName;
     private GeneratingTools generatingTools = new GeneratingTools();
 
-    public SendMessageHanding(Client client, User user) {
-        this.user = user;
+    public SendMessageHanding(Client client) {
+        this.user = new User();
         this.client = client;
     }
 

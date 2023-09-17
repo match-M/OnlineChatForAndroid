@@ -46,7 +46,7 @@ public class Client {
                              protected void initChannel(NioSocketChannel ch)
                                      throws Exception {
                                  ChannelPipeline pipeline = ch.pipeline();
-                                 pipeline.addLast(new StringDecoder(Charset.forName("GBK"))); //编码
+                                 pipeline.addLast(new StringDecoder(StandardCharsets.UTF_8)); //编码
                                  pipeline.addLast(new StringEncoder(StandardCharsets.UTF_8)); //解码w
 
                                  pipeline.addLast(new ClientHandler());

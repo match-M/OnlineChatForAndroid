@@ -2,20 +2,18 @@ package com.match.onlinechat.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.match.onlinechat.R;
 import com.match.onlinechat.controller.ControllerHall;
-import com.match.onlinechat.model.basic.constants.SearchChatRoomPrompt;
 
-public class SearchChatRoomActivity extends AppCompatActivity {
+public class SearchChatRoomActivity extends Activity {
 
     public static String searchText;
     public static ListView searchResult;
@@ -34,6 +32,23 @@ public class SearchChatRoomActivity extends AppCompatActivity {
         controllerHall = HallActivity.controllerHall;
 
         controllerHall.searchChatRoom(SearchChatRoomActivity.this, getSearchText());
+
+        searchResult.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String chatRoomName = getSearchText();
+                if (chatRoomName != null) {
+                    controllerHall.selectChatRoom(chatRoomName);
+                    Intent intent = new Intent();
+                    intent.setClass(SearchChatRoomActivity.this, ChatActivity.class);
+                    //把聊天室名字穿给ChatActivity
+                    Bundle bundle = new Bundle();
+                    bundle.putString("chatRoomName", chatRoomName);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            }
+        });
 
     }
 

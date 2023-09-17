@@ -5,6 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.NewChatRoomActivity">
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="10dp">
+
+        <Toolbar
+            android:title="@string/newChatRoom"
+            android:titleTextColor="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.cardview.widget.CardView>
 
     <EditText
         android:id="@+id/newChatRoomName"
@@ -16,6 +28,7 @@
         android:textColorHint="#95A1AA" />
 
     <Button
+        style="@style/button"
         android:id="@+id/finish"
         android:layout_width="155dp"
         android:layout_height="48dp"

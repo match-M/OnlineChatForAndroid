@@ -3,8 +3,10 @@ package com.match.onlinechat.model.basic.chat;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.match.onlinechat.activity.ChatActivity;
 import com.match.onlinechat.activity.HallActivity;
 import com.match.onlinechat.controller.ControllerHall;
+import com.match.onlinechat.model.basic.chat.message.ChatMessage;
 import com.match.onlinechat.model.basic.chat.message.SystemMessageHanding;
 import com.match.onlinechat.model.basic.chat.message.ResultMessageHandling;
 import com.match.onlinechat.model.basic.constants.SearchChatRoomPrompt;
@@ -12,19 +14,29 @@ import com.match.onlinechat.model.basic.user.SaveUserInfo;
 import com.match.onlinechat.model.basic.user.User;
 import com.match.onlinechat.model.basic.hall.Hall;
 import com.match.onlinechat.model.basic.tools.ParsingTools;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ClientHandler extends SimpleChannelInboundHandler<String> {
+    public static List<ChatMessage> chatMessages = new ArrayList<>();
     @Override
     protected void messageReceived(ChannelHandlerContext channelHandlerContext, String msg) throws Exception {
-        System.out.println(msg);
+
         ParsingTools parsingTools = new ParsingTools(msg);
         String mode = parsingTools.getString("mode");
-        ControllerHall controllerHall = HallActivity.controllerHall;
-        SaveUserInfo saveUserInfo = new SaveUserInfo();
-        Hall hall = ControllerHall.hall;
+
         User user = new User();
+        ChatMessage chatMessage;
+        Hall hall = ControllerHall.hall;
+        SaveUserInfo saveUserInfo = new SaveUserInfo();
+        ControllerHall controllerHall = HallActivity.controllerHall;
+
+        System.out.println(msg);
+
         switch (mode) {
             case "getRoomList" :{
                 hall.setChatRoom(msg);
@@ -50,13 +62,21 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
                 break;
             }
             case "SystemMessage" :{
-                SystemMessageHanding.systemMessage = parsingTools.getString("SysMsg");
+                chatMessage = new ChatMessage();
+                chatMessage.setMessage(parsingTools.getString("SysMsg"));
+                chatMessages.add(chatMessage);
+                controllerHall.showMessage(chatMessages);
                 break;
             }
             case "chat" : {
-                ResultMessageHandling.chatMessage = parsingTools.getString("message");
-                ResultMessageHandling.chatUserName = parsingTools.getString("name");
-                ResultMessageHandling.chatUserId = (int) parsingTools.get("id");
+                chatMessage = new ChatMessage();
+                chatMessage.setUserId((int) parsingTools.get("id"));
+                chatMessage.setUserName(parsingTools.getString("name"));
+                chatMessage.setMessage(parsingTools.getString("message"));
+                chatMessages.add(chatMessage);
+                //controllerHall.setMessageAdapter(chatMessages);
+                controllerHall.showMessage(chatMessages);
+
                 break;
 
             }

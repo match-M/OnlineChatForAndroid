@@ -11,7 +11,7 @@ import android.widget.EditText;
 import com.match.onlinechat.R;
 import com.match.onlinechat.controller.ControllerHall;
 
-public class NewChatRoomActivity extends AppCompatActivity {
+public class NewChatRoomActivity extends Activity {
 
     public Button finish;
     public EditText newChatRoomName;

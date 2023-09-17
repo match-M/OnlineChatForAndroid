@@ -4,14 +4,19 @@ package com.match.onlinechat.controller;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.match.onlinechat.activity.ChatActivity;
 import com.match.onlinechat.activity.NewChatRoomActivity;
 import com.match.onlinechat.activity.SearchChatRoomActivity;
 import com.match.onlinechat.activity.SignupActivity;
+import com.match.onlinechat.model.adapter.message.MessageAdapter;
+import com.match.onlinechat.model.basic.chat.message.ChatMessage;
+import com.match.onlinechat.model.basic.chat.message.SendMessageHanding;
 import com.match.onlinechat.model.basic.client.Client;
 import com.match.onlinechat.model.basic.constants.NewChatRoomPrompt;
 import com.match.onlinechat.model.basic.constants.SearchChatRoomPrompt;
@@ -23,16 +28,18 @@ import com.match.onlinechat.model.basic.hall.Register;
 import com.match.onlinechat.model.basic.user.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ControllerHall {
-
 
     private User user;
     private Client client;
     public static Hall hall;
     private Register register;
     public static ArrayList<String> list;
+    public static ChatActivity chatActivity;
     public static SignupActivity signupActivity;
+    private SendMessageHanding sendMessageHanding;
     public static NewChatRoomActivity newChatRoomActivity;
     public static SearchChatRoomActivity searchChatRoomActivity;
 
@@ -43,7 +50,7 @@ public class ControllerHall {
         client = HallActivity.client;
         user = new User();
         hall = new Hall(client);
-        System.out.println(client);
+        sendMessageHanding = new SendMessageHanding(client);
     }
 
     public void getChatRoomList(){
@@ -144,4 +151,29 @@ public class ControllerHall {
         });
     }
 
+    public void selectChatRoom(String chatRoomName){
+        hall.selectRoom(chatRoomName);
+    }
+
+    public void sendMessage(String message){
+        sendMessageHanding.message(message);
+    }
+
+    public void setChatActivity(ChatActivity chatActivity){
+        ControllerHall.chatActivity = chatActivity;
+    }
+
+    public void showMessage(List<ChatMessage> chatMessages){
+        ChatActivity.messageAdapter = new MessageAdapter(chatActivity, chatMessages);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                ChatActivity.lv_messageList.setAdapter(ChatActivity.messageAdapter); //设置适配器
+                if(chatMessages.size() > 5){
+                    ChatActivity.lv_messageList.setStackFromBottom(true);
+                }
+                //android:stackFromBottom="true"
+            }
+        });
+    }
 }

@@ -1,8 +1,6 @@
 package com.match.onlinechat.activity;
 
 import android.app.Activity;
-
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -11,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.match.onlinechat.R;
 import com.match.onlinechat.model.basic.user.User;
 
-public class ShowUserInfoActivity extends AppCompatActivity {
+public class ShowUserInfoActivity extends Activity {
 
     private TextView userName;
     private TextView userId;
